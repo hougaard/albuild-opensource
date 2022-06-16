@@ -24,3 +24,17 @@ The admin tool enables you to perform maintanence operations on the translation 
 * Edit specific entries
 * Bulk import from XLF files
 * Ripper for BC artifacts - To reuse translations from Microsoft
+
+# Standalone Translation Tool
+The standalone translation tool enables you to add translations to an AL app (working in the /Translation folder)
+
+# Configuration
+
+Each app has a .config file where you configure:
+
+* AzureKey for Azure Cognitive Services (translation)
+* "App Name" for specifying in XLF where translation comes from
+* Location of local translation database
+* List of langauges supported
+* Storage Account and key for Azure Table Storage
+
