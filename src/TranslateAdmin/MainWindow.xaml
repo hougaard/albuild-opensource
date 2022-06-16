@@ -1,0 +1,52 @@
+﻿<Window x:Class="TranslateAdmin.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TranslateAdmin"
+        mc:Ignorable="d"
+        Title="ALBuild Translation - Admin Interface" SizeToContent="WidthAndHeight" Background="LightGray">
+    <Grid>
+        <Menu>
+            <MenuItem Header="_File">
+                <MenuItem Header="_Exit" Name="Exit" Click="Exit_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="_Import XLF" x:Name="ImportXLFMenu" Click="ImportXLFMenu_Click" />
+                <MenuItem Header="_Artifact Ripper" x:Name="RipperMenu" Click="Ripper_Click" />
+            </MenuItem>
+        </Menu>
+        <StackPanel Orientation="Vertical" Grid.ColumnSpan="2" Margin="0,20,0,0">
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock FontSize="20" Margin="0,0,10,0">Search</TextBlock>
+                <TextBox FontSize="20" x:Name="SearchName" Width="400" />
+                <ComboBox x:Name="LanguageSelect" Width="100" />
+                <Button FontSize="20" x:Name="SearchButton" Margin="10,0,0,0" Padding="10,0,10,0" Click="SearchButton_Click">Search</Button>
+            </StackPanel>
+            <ListView x:Name="Result" Height="300" Width="800" Margin="10,0,10,0" SelectionMode="Single" MouseDoubleClick="Result_MouseDoubleClick" FontSize="16">
+            </ListView>
+            <StackPanel Orientation="Vertical" Height="200" Margin="10,10,10,20">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock FontSize="20" Width="100">Source</TextBlock>
+                    <TextBox FontSize="20" Width="400" x:Name="source"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock FontSize="20" Width="100">Language</TextBlock>
+                    <TextBox FontSize="20" Width="400" x:Name="language" IsReadOnly="true"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock FontSize="20" Width="100">Target</TextBlock>
+                    <TextBox FontSize="20" Width="400" x:Name="target"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock FontSize="20" Width="100">Origin</TextBlock>
+                    <TextBox FontSize="20"  Width="400" x:Name="Origin"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button x:Name="Save" FontSize="20" Margin="100,0,0,0" Padding="5" IsEnabled="false" Click="Save_Click">Save</Button>
+                    <Button x:Name="Cancel" FontSize="20" Margin="10,0,0,0" Padding="5" IsEnabled="false" Click="Cancel_Click">Cancel</Button>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,171 @@
+{
+  "Project": "Erik's ToolBox",
+  "Tasks": [
+    {
+      "Type": "DeployBasicDocker",
+      "Settings": {
+        "AppFile": "c:\\projects\\albuild\\testrunner\\Hougaard_ALBuild TestRunner_1.0.0.0.app",
+        "BaseURL": "http://bc19:7049/BC/",
+        "User": "demo",
+        "Password": "demo",
+        "SchemaUpdateMode": "forcesync"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\toolbox\\multiroot",
+        "Command": "pull"
+      }
+    },
+    {
+      "Type": "UpdateVersion",
+      "Settings": {
+        "AppPath": "c:\\projects\\toolbox\\multiroot\\alcompilerandinterpreter",
+        "VersionPartToIncrement": 4,
+        "Increment": 1
+      }
+    },
+    {
+      "Type": "Remember",
+      "Settings": {
+        "AppPath": "c:\\projects\\toolbox\\multiroot\\alcompilerandinterpreter"
+      }
+    },
+    {
+      "Type": "Compile",
+      "Settings": {
+        "AppPath": "%APPPATH%"
+      }
+    },
+    {
+      "Type": "Translate",
+      "Settings": {
+        "XLFPath": "%APPPATH%\\Translations\\%NAME%.g.xlf",
+        "ProductName": "%NAME%"
+      }
+    },
+    {
+      "Type": "Compile",
+      "Settings": {
+        "AppPath": "%APPPATH%"
+      }
+    },
+    {
+      "Type": "Sign",
+      "Settings": {
+        "AppPath": "%APPPATH%",
+        "KeyFile": "c:\\projects\\Keystore\\codesign.pfx",
+        "Password": "demo"
+      }
+    },
+    {
+      "Type": "Copy",
+      "Settings": {
+        "From": "%APPPATH%\\%PUBLISHER%_%NAME%_%VERSION%.app",
+        "To": "C:\\Projects\\ToolBox\\build\\Release\\%PUBLISHER%_%NAME%_%VERSION%.app"
+      }
+    },
+    {
+      "Type": "DeploySaaS",
+      "Settings": {
+        "AppFile": "%APPPATH%\\%PUBLISHER%_%NAME%_%VERSION%.app",
+        "ClientId": "fffd35f7-aff0-4fef-baf7-44d83972576b",
+        "ClientSecret": "LdI7Q~lO_u2x-0MUyBAqGXAUUTlKhuCJwNUvG",
+        "TenantId": "c2f19d2f-252e-4d89-a7c7-5bb9042d59bb",
+        "Environment": "acs",
+        "SchemaUpdateMode": "forcesync"
+      }
+    },
+    {
+      "Type": "TestBasicDocker",
+      "Settings": {
+        "BaseURL": "http://bc19:7048/BC/",
+        "User": "demo",
+        "Password": "demo",
+        "Company": "CRONUS Canada, Inc.",
+        "TestCodeunit": 70310410
+      }
+    },
+    {
+      "Type": "UpdateVersion",
+      "Settings": {
+        "AppPath": "c:\\projects\\toolbox\\multiroot\\ToolBox",
+        "VersionPartToIncrement": 4,
+        "Increment": 1
+      }
+    },
+    {
+      "Type": "Remember",
+      "Settings": {
+        "AppPath": "c:\\projects\\toolbox\\multiroot\\ToolBox"
+      }
+    },
+    {
+      "Type": "Compile",
+      "Settings": {
+        "AppPath": "%APPPATH%"
+      }
+    },
+    {
+      "Type": "Translate",
+      "Settings": {
+        "XLFPath": "%APPPATH%\\Translations\\%NAME%.g.xlf",
+        "ProductName": "%NAME%"
+      }
+    },
+    {
+      "Type": "Compile",
+      "Settings": {
+        "AppPath": "%APPPATH%"
+      }
+    },
+    {
+      "Type": "Sign",
+      "Settings": {
+        "AppPath": "%APPPATH%",
+        "KeyFile": "c:\\projects\\Keystore\\codesign.pfx",
+        "Password": "demo"
+      }
+    },
+    {
+      "Type": "DeploySaaS",
+      "Settings": {
+        "AppFile": "%APPPATH%\\%PUBLISHER%_%NAME%_%VERSION%.app",
+        "ClientId": "fffd35f7-aff0-4fef-baf7-44d83972576b",
+        "ClientSecret": "LdI7Q~lO_u2x-0MUyBAqGXAUUTlKhuCJwNUvG",
+        "TenantId": "c2f19d2f-252e-4d89-a7c7-5bb9042d59bb",
+        "Environment": "acs",
+        "SchemaUpdateMode": "forcesync"
+      }
+    },
+    {
+      "Type": "Copy",
+      "Settings": {
+        "From": "%APPPATH%\\%PUBLISHER%_%NAME%_%VERSION%.app",
+        "To": "C:\\Projects\\ToolBox\\build\\Release\\%PUBLISHER%_%NAME%_%VERSION%.app"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\toolbox\\multiroot",
+        "Command": "add *"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\toolbox\\multiroot",
+        "Command": "commit -a -m \"ALBuild Version %VERSION%\""
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\toolbox\\multiroot",
+        "Command": "push"
+      }
+    }
+  ]
+}

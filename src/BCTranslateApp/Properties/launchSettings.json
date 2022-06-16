@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BCTranslateApp": {
+      "commandName": "Project",
+      "commandLineArgs": "\"SharePoint Connector.g.xlf\" \"SharePoint Connector\""
+    }
+  }
+}

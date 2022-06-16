@@ -1,0 +1,31 @@
+{
+  "Project": "Erik's ToolBox Simple Test",
+  "Tasks": [
+    {
+      "Type": "Remember",
+      "Settings": {
+        "AppPath": "c:\\projects\\toolbox\\multiroot\\alcompilerandinterpreter"
+      }
+    },
+    {
+      "Type": "DeployBasicDocker",
+      "Settings": {
+        "AppFile": "c:\\projects\\albuild\\testrunner\\Hougaard_ALBuild TestRunner_1.0.0.0.app",
+        "BaseURL": "http://bc19:7049/BC/",
+        "User": "demo",
+        "Password": "demo",
+        "SchemaUpdateMode": "forcesync"
+      }
+    },
+    {
+      "Type": "TestBasicDocker",
+      "Settings": {
+        "BaseURL": "http://bc19:7048/BC/",
+        "User": "demo",
+        "Password": "demo",
+        "Company": "CRONUS Canada, Inc.",
+        "TestCodeunit": 70310410
+      }
+    }
+  ]
+}

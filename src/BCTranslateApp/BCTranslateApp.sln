@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31321.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCTranslateApp", "BCTranslateApp.csproj", "{9A7CCDB5-C162-4EC9-B9DD-F93CC4889BFB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtifactRipper", "..\ArtifactRipper\ArtifactRipper.csproj", "{12EBF12D-DBB5-48B8-8619-C1C5E7FA6A89}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TranslationTools", "..\TranslationTools\TranslationTools.csproj", "{80232125-D55E-4169-8AE7-10213E16D5EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIteDB2Azure", "..\LIteDB2Azure\LIteDB2Azure.csproj", "{4B69E4D1-3EC4-4F4D-BED1-943034A69CF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportXlf", "..\ImportXlf\ImportXlf.csproj", "{B7BA3009-02DA-4FF0-A7D5-179D3219522F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranslateAdmin", "..\TranslateAdmin\TranslateAdmin.csproj", "{3DC57A14-708B-43AC-9AA9-26419ED0006F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A7CCDB5-C162-4EC9-B9DD-F93CC4889BFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A7CCDB5-C162-4EC9-B9DD-F93CC4889BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A7CCDB5-C162-4EC9-B9DD-F93CC4889BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A7CCDB5-C162-4EC9-B9DD-F93CC4889BFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12EBF12D-DBB5-48B8-8619-C1C5E7FA6A89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12EBF12D-DBB5-48B8-8619-C1C5E7FA6A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12EBF12D-DBB5-48B8-8619-C1C5E7FA6A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12EBF12D-DBB5-48B8-8619-C1C5E7FA6A89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80232125-D55E-4169-8AE7-10213E16D5EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80232125-D55E-4169-8AE7-10213E16D5EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80232125-D55E-4169-8AE7-10213E16D5EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80232125-D55E-4169-8AE7-10213E16D5EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B69E4D1-3EC4-4F4D-BED1-943034A69CF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B69E4D1-3EC4-4F4D-BED1-943034A69CF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B69E4D1-3EC4-4F4D-BED1-943034A69CF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B69E4D1-3EC4-4F4D-BED1-943034A69CF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7BA3009-02DA-4FF0-A7D5-179D3219522F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7BA3009-02DA-4FF0-A7D5-179D3219522F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7BA3009-02DA-4FF0-A7D5-179D3219522F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7BA3009-02DA-4FF0-A7D5-179D3219522F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DC57A14-708B-43AC-9AA9-26419ED0006F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DC57A14-708B-43AC-9AA9-26419ED0006F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DC57A14-708B-43AC-9AA9-26419ED0006F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DC57A14-708B-43AC-9AA9-26419ED0006F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DD11BDD-8B70-4700-8363-267A596E369E}
+	EndGlobalSection
+EndGlobal
