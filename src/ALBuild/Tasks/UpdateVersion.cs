@@ -35,32 +35,18 @@ namespace ALBuild.Tasks
             }
             VersionParts[PartNo] = NewBuildNumber.ToString();
 
+            if (Settings.ContainsKey("DateInVersionPartNo"))
+            {
+                var DatePartNo = Settings["DateInVersionPartNo"].ToObject<int>() - 1;
+                VersionParts[DatePartNo] = DateTime.Now.ToString("yyyymmdd");
+            }
+
             js["version"] = VersionParts[0] + "." + VersionParts[1] + "." + VersionParts[2] + "." + VersionParts[3];
             Console.WriteLine("- New version {0}", js["version"].ToString());
-
 
             File.WriteAllText(appjson, js.ToString());
 
             return new Result(true);
-            //if (args[argno].ToLower().Contains(".csproj"))
-            //{
-            //    var xml = File.ReadAllText(args[argno]);
-            //    int p1 = xml.IndexOf("<Version>");
-            //    int p2 = xml.IndexOf("</Version>");
-
-            //    var VersionParts = xml.Substring(p1 + "<Version>".Length, p2 - p1 - "<Version>".Length).Split('.');
-            //    int v = Convert.ToInt32(VersionParts[PartNo]);
-            //    Console.WriteLine("Old Build No {0}", v);
-            //    if (NewBuildNumber == 0)
-            //    {
-            //        NewBuildNumber = v + 1;
-            //        Console.WriteLine("New Build No {0}", NewBuildNumber);
-            //        File.WriteAllText("SETVERSION.CMD", "SET ALVERSION=" + NewBuildNumber.ToString() + "\n");
-            //    }
-            //    VersionParts[PartNo] = NewBuildNumber.ToString();
-            //    xml = xml.Substring(0, p1 + 9) + VersionParts[0] + "." + VersionParts[1] + "." + VersionParts[2] + "." + VersionParts[3] + xml.Substring(p2);
-            //    File.WriteAllText(args[argno], xml);
-            //}
         }
     }
 }
