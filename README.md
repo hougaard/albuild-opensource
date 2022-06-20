@@ -8,6 +8,8 @@ ALBuild supports the following types of operations:
 * File Copy operations
 * Deploy app to Docker container with Basic authentication
 * Deploy app to Business Central SaaS with service 2 service OAuth authentiation
+* Download Symbols from Docker container
+* Download Symbols from SaaS sandbox
 * PowerShell operations
 * App Signing (using signtool.exe)
 * Run test codeunits on Docker container with Basic authentication
