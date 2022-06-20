@@ -38,7 +38,7 @@
     {
 	"Type": "DownloadSymbolsDocker",
 	"Settings": {
-        "AppPath": "%APPAPTH%",
+        "AppPath": "%APPPATH%",
         "BaseURL": "http://bc20:7049/BC/",
         "User": "demo",
         "Password": "demo"  	

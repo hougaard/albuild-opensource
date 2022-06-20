@@ -29,12 +29,12 @@ namespace ALBuild
                 return;
             }
             Console.WriteLine("- Reading build script {0}", args[0]);
-                var BuildScript = JObject.Parse(File.ReadAllText(args[0]));
+            var BuildScript = JObject.Parse(File.ReadAllText(args[0]));
             Console.WriteLine("- Building {0}", BuildScript["Project"]);
 
             if (args.Length > 1)
             {
-                for(int i = 1; i < args.Length; i++)
+                for (int i = 1; i < args.Length; i++)
                 {
                     if (args[i].ToLower() == "-offline")
                         OffLineMode = true;
@@ -46,14 +46,14 @@ namespace ALBuild
             foreach (var Task in Tasks)
             {
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("- {0}",Task["Type"].ToString());
+                Console.WriteLine("- {0}", Task["Type"].ToString());
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 PrepareSettings(Task, CurrentApp);
                 Result Res = null;
-                switch(Task["Type"].ToString())
+                switch (Task["Type"].ToString())
                 {
                     case "Git":
-                        Res = new Git().Run((JObject)Task["Settings"],OffLineMode);
+                        Res = new Git().Run((JObject)Task["Settings"], OffLineMode);
                         break;
                     case "UpdateVersion":
                         Res = new UpdateVersion().Run((JObject)Task["Settings"]);
@@ -66,10 +66,10 @@ namespace ALBuild
                         Res = new Compile().Run((JObject)Task["Settings"]);
                         break;
                     case "Translate":
-                        Res = new Translate().Run((JObject)Task["Settings"],hostFile,OffLineMode);
+                        Res = new Translate().Run((JObject)Task["Settings"], hostFile, OffLineMode);
                         break;
                     case "Sign":
-                        Res = new Sign().Run((JObject)Task["Settings"],CurrentApp,hostFile);
+                        Res = new Sign().Run((JObject)Task["Settings"], CurrentApp, hostFile);
                         break;
                     case "Copy":
                         Res = new Copy().Run((JObject)Task["Settings"]);
@@ -110,7 +110,7 @@ namespace ALBuild
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Error: {0}",Res.Message);
+                        Console.WriteLine("Error: {0}", Res.Message);
                         Console.ForegroundColor = ConsoleColor.White;
                         return;
                     }
@@ -127,18 +127,24 @@ namespace ALBuild
             if (currentApp != null)
             {
                 var Settings = (JObject)task["Settings"];
-                foreach(var setting in Settings)
+                foreach (var setting in Settings)
                 {
                     while (reg.IsMatch(Settings[setting.Key].ToString()))
                     {
-                            var m = reg.Match(Settings[setting.Key].ToString());
+                        var m = reg.Match(Settings[setting.Key].ToString());
                         if (m.Success)
                         {
                             Capture cap = m.Captures[0];
                             var SettingsKey = Settings[setting.Key].ToString().Substring(cap.Index, cap.Length);
-                            var newvalue = currentApp[SettingsKey.Trim('%').ToLower()].ToString();
-                            Settings[setting.Key] = Settings[setting.Key].ToString().Replace(SettingsKey,newvalue);
-
+                            if (!currentApp.ContainsKey(SettingsKey))
+                            {
+                                Console.WriteLine("Unknown {0} in {1}", SettingsKey, setting);
+                            }
+                            else
+                            {
+                                var newvalue = currentApp[SettingsKey.Trim('%').ToLower()].ToString();
+                                Settings[setting.Key] = Settings[setting.Key].ToString().Replace(SettingsKey, newvalue);
+                            }
                         }
                     }
                 }
