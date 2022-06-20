@@ -40,7 +40,19 @@ Each app has a .config file where you configure:
 * List of languages supported
 * Storage Account and key for Azure Table Storage
 
+```<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="AzureKey" value="<Azure Translation Cognitive Servivce key>" />
+    <add key="Name" value="translate" />
+    <add key="Database" value="<Path and Name of translation.db>"/>
+    <add key="Languages" value="en-AU,de-AT,nl-BE,fr-BE,en-CA,fr-CA,da-DK,de-DE,fi-FI,fr-FR,is-IS,it-IT,es-MX,nl-NL,en-NZ,nb-NO,es-ES_tradnl,sv-SE,fr-CH,de-CH,it-CH,en-GB,en-US,et-EE,zh-HK,ja-JP,pl-PL,en-ZA,ko-KR,zh-TW,cs-CZ,ru-RU"/>
 
+    <add key="storageaccount" value="<Azure Storage Account>"/>
+    <add key="storageaccountkey" value="<Azure Storage Account Access Key>"/>
+  </appSettings>
+</configuration>
+```
 
 # Build File
 
