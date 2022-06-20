@@ -19,7 +19,7 @@ ALBuild supports the following types of operations:
 
 The list of operations is defined in a .json file that describes the series of operations.
 
-# ALBuild Translation Administartion 
+# ALBuild Translation Administration 
 
 The admin tool enables you to perform maintanence operations on the translation database, such as:
 
@@ -37,6 +37,6 @@ Each app has a .config file where you configure:
 * AzureKey for Azure Cognitive Services (translation)
 * "App Name" for specifying in XLF where translation comes from
 * Location of local translation database
-* List of langauges supported
+* List of languages supported
 * Storage Account and key for Azure Table Storage
 
