@@ -69,6 +69,7 @@ namespace ALBuild.Tasks
 
                     for (int i = 0; i < Apps.Count; i++)
                     {
+                        Console.WriteLine("- Downloading {0}", Apps[i].ToString());
 
                         string URL2 = "https://api.businesscentral.dynamics.com/v2.0/" +
                                       Settings["Environment"] +

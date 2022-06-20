@@ -2,7 +2,7 @@
   "profiles": {
     "ALBuild": {
       "commandName": "Project",
-      "commandLineArgs": "test.json"
+      "commandLineArgs": "pos.json"
     }
   }
 }

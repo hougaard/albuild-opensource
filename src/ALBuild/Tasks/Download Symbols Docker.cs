@@ -18,7 +18,7 @@ namespace ALBuild.Tasks
         {
             try
             {
-                string BaseURL = Settings["BaseURL"].ToString();
+                string BaseURL = Settings["BaseURL"].ToString().TrimEnd('/');
                 string User = Settings["User"].ToString();
                 string Password = Settings["Password"].ToString();
                 string Authentication = Convert.ToBase64String(Encoding.UTF8.GetBytes(User + ":" + Password));
@@ -56,17 +56,14 @@ namespace ALBuild.Tasks
 
                 for (int i = 0; i < Apps.Count; i++)
                 {
-
-                    string URL2 = "https://api.businesscentral.dynamics.com/v2.0/" +
-                                  Settings["Environment"] +
+                    Console.WriteLine("- Downloading {0}",Apps[i].ToString());
+                    string URL2 = BaseURL +
                                   "/dev/packages?publisher=" + Publishers[i] +
                                   "&appName=" + Apps[i] +
                                   "&versionText=" + Versions[i];
 
                     HttpClient httpClient = new HttpClient();
                     httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + Authentication);
-                    MultipartFormDataContent multipartFormDataContent = new MultipartFormDataContent();
-
                     var result = await httpClient.GetByteArrayAsync(URL2);
                     File.WriteAllBytes(Settings["AppPath"].ToString() + "\\.alpackages\\" + Publishers[i] + "_" + Apps[i] + "_" + Versions[i] + "_temp.app", result);
                 }
