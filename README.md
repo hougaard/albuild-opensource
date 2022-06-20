@@ -21,7 +21,7 @@ The list of operations is defined in a .json file that describes the series of o
 
 # ALBuild Translation Administration 
 
-The admin tool enables you to perform maintanence operations on the translation database, such as:
+The admin tool enables you to perform maintenance operations on the translation database, such as:
 
 * Edit specific entries
 * Bulk import from XLF files
