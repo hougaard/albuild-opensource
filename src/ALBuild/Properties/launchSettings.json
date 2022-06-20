@@ -2,7 +2,7 @@
   "profiles": {
     "ALBuild": {
       "commandName": "Project",
-      "commandLineArgs": "c:\\projects\\toolbox\\build\\toolbox.json -offline"
+      "commandLineArgs": "test.json"
     }
   }
 }

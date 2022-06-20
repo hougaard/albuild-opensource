@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TranslateAdmin"
         mc:Ignorable="d"
-        Title="ALBuild Translation - Admin Interface" SizeToContent="WidthAndHeight" Background="LightGray">
+        Title="ALBuild Translation - Admin Interface 22.05.01" SizeToContent="WidthAndHeight" Background="LightGray">
     <Grid>
         <Menu>
             <MenuItem Header="_File">

@@ -18,9 +18,8 @@ namespace BCTranslateApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("ALBuild Standalone Translation");
-            Console.WriteLine("------------------------------");
-            Console.WriteLine("Verion 3.05 (c) Hougaard.com");
+            Console.WriteLine("ALBuild - Translate App 22.05.01");
+            Console.WriteLine("(c) 2022 Erik Hougaard - hougaard.com");
 
             if (args.Length != 2)
             {

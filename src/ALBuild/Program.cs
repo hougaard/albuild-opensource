@@ -12,7 +12,7 @@ namespace ALBuild
         static async Task Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("ALBuild 1.04");
+            Console.WriteLine("ALBuild 22.05.01");
             Console.WriteLine("(c) 2022 Erik Hougaard - hougaard.com");
             if (args.Length == 0)
             {
@@ -88,6 +88,12 @@ namespace ALBuild
                         break;
                     case "TestBasicDocker":
                         Res = await new TestBasicDocker().RunAsync((JObject)Task["Settings"]);
+                        break;
+                    case "DownloadSymbolsSaaS":
+                        Res = await new DownloadSymbolsSaaS().RunAsync((JObject)Task["Settings"]);
+                        break;
+                    case "DownloadSymbolsDocker":
+                        Res = await new DownloadSymbolsDocker().RunAsync((JObject)Task["Settings"]);
                         break;
                     default:
                         Console.WriteLine("Unkown task \"{0}\", aborting", Task["Type"].ToString());

@@ -398,6 +398,7 @@ FodyWeavers.xsd
 *.sln.iml
 
 # AL
+LaunchSettings.json
 *.app
 launch.json
 .vscode/
