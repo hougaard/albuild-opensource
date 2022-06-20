@@ -1,13 +1,13 @@
 # ALBuild
 
-ALBuild is a tool for building AL applications in both pipeline and non-pipeline environments. It maintains a database of translations.
+ALBuild is an open-source tool for building AL applications in both pipeline and non-pipeline environments. It maintains a database of translations.
 
 ALBuild supports the following types of operations:
 
 * GIT operations
 * File Copy operations
 * Deploy app to Docker container with Basic authentication
-* Deploy app to Business Central SaaS with service 2 service OAuth authentiation
+* Deploy app to Business Central SaaS with service 2 service OAuth authentication
 * Download Symbols from Docker container
 * Download Symbols from SaaS sandbox
 * PowerShell operations
@@ -17,7 +17,7 @@ ALBuild supports the following types of operations:
 * Translate XLF using Azure Cognitive Services
 * Update version in app.json
 
-The list of operatinos is defined in a .json file that describes the series of operations.
+The list of operations is defined in a .json file that describes the series of operations.
 
 # ALBuild Translation Administartion 
 
