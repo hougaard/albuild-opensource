@@ -40,3 +40,117 @@ Each app has a .config file where you configure:
 * List of languages supported
 * Storage Account and key for Azure Table Storage
 
+```<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="AzureKey" value="<Azure Translation Cognitive Servivce key>" />
+    <add key="Name" value="translate" />
+    <add key="Database" value="<Path and Name of translation.db>"/>
+    <add key="Languages" value="en-AU,de-AT,nl-BE,fr-BE,en-CA,fr-CA,da-DK,de-DE,fi-FI,fr-FR,is-IS,it-IT,es-MX,nl-NL,en-NZ,nb-NO,es-ES_tradnl,sv-SE,fr-CH,de-CH,it-CH,en-GB,en-US,et-EE,zh-HK,ja-JP,pl-PL,en-ZA,ko-KR,zh-TW,cs-CZ,ru-RU"/>
+
+    <add key="storageaccount" value="<Azure Storage Account>"/>
+    <add key="storageaccountkey" value="<Azure Storage Account Access Key>"/>
+  </appSettings>
+</configuration>
+```
+
+# Build File
+
+The following is an example of a build json file:
+
+```{
+  "Project": "Demo",
+  "Report" : "Email",
+  "ReportDestination" : "appowner@company.com,
+  "Tasks": [
+    {
+      "Type": "DeployBasicDocker",
+      "Settings": {
+        "AppFile": "c:\\projects\\albuild\\testrunner\\Hougaard_ALBuild TestRunner_1.0.0.0.app",
+        "BaseURL": "http://bc20:7049/BC/",
+        "User": "demo",
+        "Password": "demo",
+        "SchemaUpdateMode": "forcesync"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\youtube\\point of sale",
+        "Command": "pull"
+      }
+    },
+    {
+      "Type": "UpdateVersion",
+      "Settings": {
+        "AppPath": "c:\\projects\\youtube\\point of sale",
+        "VersionPartToIncrement": 4,
+        "Increment": 1,
+	      "DateInVersionPartNo":3
+      }
+    },
+    {
+      "Type": "Remember",
+      "Settings": {
+        "AppPath": "c:\\projects\\youtube\\point of sale"
+      }
+    },
+    {
+	"Type": "DownloadSymbolsDocker",
+	"Settings": {
+        "AppPath": "%APPPATH%",
+        "BaseURL": "http://bc20:7049/BC/",
+        "User": "demo",
+        "Password": "demo"  	
+	}
+    },
+    {
+      "Type": "Compile",
+      "Settings": {
+        "AppPath": "%APPPATH%"
+      }
+    },
+    {
+      "Type": "Translate",
+      "Settings": {
+        "XLFPath": "%APPPATH%\\Translations\\%NAME%.g.xlf",
+        "ProductName": "%NAME%"
+      }
+    },
+    {
+      "Type": "Compile",
+      "Settings": {
+        "AppPath": "%APPPATH%"
+      }
+    },
+    {
+      "Type": "Copy",
+      "Settings": {
+        "From": "%APPPATH%\\%PUBLISHER%_%NAME%_%VERSION%.app",
+        "To": "C:\\Projects\\youtube\\ALbuild\\Release\\%PUBLISHER%_%NAME%_%VERSION%.app"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "%APPPATH%",
+        "Command": "add *"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "%APPPATH%",
+        "Command": "commit -a -m \"ALBuild Version %VERSION%\""
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "%APPPATH%",
+        "Command": "push"
+      }
+    }
+  ]
+}
+```
