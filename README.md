@@ -40,3 +40,105 @@ Each app has a .config file where you configure:
 * List of languages supported
 * Storage Account and key for Azure Table Storage
 
+
+
+# Build File
+
+The following is an example of a build json file:
+
+```{
+  "Project": "Demo",
+  "Report" : "Email",
+  "ReportDestination" : "appowner@company.com,
+  "Tasks": [
+    {
+      "Type": "DeployBasicDocker",
+      "Settings": {
+        "AppFile": "c:\\projects\\albuild\\testrunner\\Hougaard_ALBuild TestRunner_1.0.0.0.app",
+        "BaseURL": "http://bc20:7049/BC/",
+        "User": "demo",
+        "Password": "demo",
+        "SchemaUpdateMode": "forcesync"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\youtube\\point of sale",
+        "Command": "pull"
+      }
+    },
+    {
+      "Type": "UpdateVersion",
+      "Settings": {
+        "AppPath": "c:\\projects\\youtube\\point of sale",
+        "VersionPartToIncrement": 4,
+        "Increment": 1,
+	      "DateInVersionPartNo":3
+      }
+    },
+    {
+      "Type": "Remember",
+      "Settings": {
+        "AppPath": "c:\\projects\\youtube\\point of sale"
+      }
+    },
+    {
+	"Type": "DownloadSymbolsDocker",
+	"Settings": {
+        "AppPath": "%APPPATH%",
+        "BaseURL": "http://bc20:7049/BC/",
+        "User": "demo",
+        "Password": "demo"  	
+	}
+    },
+    {
+      "Type": "Compile",
+      "Settings": {
+        "AppPath": "%APPPATH%"
+      }
+    },
+    {
+      "Type": "Translate",
+      "Settings": {
+        "XLFPath": "%APPPATH%\\Translations\\%NAME%.g.xlf",
+        "ProductName": "%NAME%"
+      }
+    },
+    {
+      "Type": "Compile",
+      "Settings": {
+        "AppPath": "%APPPATH%"
+      }
+    },
+    {
+      "Type": "Copy",
+      "Settings": {
+        "From": "%APPPATH%\\%PUBLISHER%_%NAME%_%VERSION%.app",
+        "To": "C:\\Projects\\youtube\\ALbuild\\Release\\%PUBLISHER%_%NAME%_%VERSION%.app"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\youtube\\point of sale",
+        "Command": "add *"
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\youtube\\point of sale",
+        "Command": "commit -a -m \"ALBuild Version %VERSION%\""
+      }
+    },
+    {
+      "Type": "Git",
+      "Settings": {
+        "Path": "c:\\projects\\youtube\\point of sale",
+        "Command": "push"
+      }
+    }
+  ]
+}
+```
