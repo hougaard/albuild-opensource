@@ -121,21 +121,21 @@ The following is an example of a build json file:
     {
       "Type": "Git",
       "Settings": {
-        "Path": "c:\\projects\\youtube\\point of sale",
+        "Path": "%APPPATH%",
         "Command": "add *"
       }
     },
     {
       "Type": "Git",
       "Settings": {
-        "Path": "c:\\projects\\youtube\\point of sale",
+        "Path": "%APPPATH%",
         "Command": "commit -a -m \"ALBuild Version %VERSION%\""
       }
     },
     {
       "Type": "Git",
       "Settings": {
-        "Path": "c:\\projects\\youtube\\point of sale",
+        "Path": "%APPPATH%",
         "Command": "push"
       }
     }
