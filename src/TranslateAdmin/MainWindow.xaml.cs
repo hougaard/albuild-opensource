@@ -201,8 +201,8 @@ namespace TranslateAdmin
                 {
                     tableClient.UpdateEntity(entity, Azure.ETag.All);
                 }
-                MessageBox.Show("Done");
             }
+            MessageBox.Show("Done");
         }
     }
 }
