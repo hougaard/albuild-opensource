@@ -134,49 +134,56 @@ namespace TranslateAdmin
                                         StreamReader sr = new StreamReader(TransStream);
 
                                         var model = XlfParser.Converter.Deserialize(sr.ReadToEnd());
-                                        worker.ReportProgress(0, string.Format(" - {0} translations in file", model.File.Body.Group.TransUnit.Count));
-                                        int counter = 0;
-                                        foreach (var Entry in model.File.Body.Group.TransUnit)
+                                        if (!ConfigurationManager.AppSettings["Languages"].Split(',').ToList().Contains(model.File.TargetLanguage))
                                         {
-                                            /*
-                                              <trans-unit id="Table 3759370895 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
-                                                  <source>Account Entity Setup</source>
-                                                  <target>Account Entity Setup</target>
-                                                  <note from="Developer" annotates="general" priority="2"></note>
-                                                  <note from="Xliff Generator" annotates="general" priority="3">Table Account Entity Setup - Property Caption</note>
-                                              </trans-unit>
-                                             */
-                                            Translation StoreTranslation = new Translation();
-                                            StoreTranslation.source = Entry.Source;
-                                            StoreTranslation.target = Entry.Target;
-                                            StoreTranslation.Language = model.File.TargetLanguage;
-                                            StoreTranslation.Origin = entry.Name + " " + Name;
-                                            StoreTranslation.Index = Translation.Hash(StoreTranslation.Language, StoreTranslation.source);
-                                            if (!col.Exists(x => x.Index == StoreTranslation.Index))
+                                            worker.ReportProgress(0, string.Format(" - Skipping {0} translations in {1} file as the language is not included in .config key 'Languages'", model.File.Body.Group.TransUnit.Count, model.File.TargetLanguage));
+                                        }
+                                        else
+                                        {
+                                            worker.ReportProgress(0, string.Format(" - {0} translations in file", model.File.Body.Group.TransUnit.Count));
+                                            int counter = 0;
+                                            foreach (var Entry in model.File.Body.Group.TransUnit)
                                             {
-                                                col.Insert(StoreTranslation);
-                                                col.EnsureIndex(x => x.Index);
+                                                /*
+                                                  <trans-unit id="Table 3759370895 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+                                                      <source>Account Entity Setup</source>
+                                                      <target>Account Entity Setup</target>
+                                                      <note from="Developer" annotates="general" priority="2"></note>
+                                                      <note from="Xliff Generator" annotates="general" priority="3">Table Account Entity Setup - Property Caption</note>
+                                                  </trans-unit>
+                                                 */
+                                                Translation StoreTranslation = new Translation();
+                                                StoreTranslation.source = Entry.Source;
+                                                StoreTranslation.target = Entry.Target;
+                                                StoreTranslation.Language = model.File.TargetLanguage;
+                                                StoreTranslation.Origin = entry.Name + " " + Name;
+                                                StoreTranslation.Index = Translation.Hash(StoreTranslation.Language, StoreTranslation.source);
+                                                if (!col.Exists(x => x.Index == StoreTranslation.Index))
+                                                {
+                                                    col.Insert(StoreTranslation);
+                                                    col.EnsureIndex(x => x.Index);
 
-                                                var entity = new TableEntity(StoreTranslation.Language, StoreTranslation.Index)
+                                                    var entity = new TableEntity(StoreTranslation.Language, StoreTranslation.Index)
+                                                        {
+                                                            { "Language", StoreTranslation.Language},
+                                                            { "Origin", StoreTranslation.Origin },
+                                                            { "Source", StoreTranslation.source },
+                                                            { "Target", StoreTranslation.target }
+                                                        };
+                                                    try
                                                     {
-                                                        { "Language", StoreTranslation.Language},
-                                                        { "Origin", StoreTranslation.Origin },
-                                                        { "Source", StoreTranslation.source },
-                                                        { "Target", StoreTranslation.target }
-                                                    };
-                                                try
-                                                {
-                                                    tableClient.AddEntity(entity);
+                                                        tableClient.AddEntity(entity);
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        tableClient.UpdateEntity(entity, Azure.ETag.All);
+                                                    }
                                                 }
-                                                catch (Exception ex)
+                                                counter++;
+                                                if (counter % 1000 == 0)
                                                 {
-                                                    tableClient.UpdateEntity(entity, Azure.ETag.All);
+                                                    worker.ReportProgress(0, string.Format(" - {0} processed", counter));
                                                 }
-                                            }
-                                            counter++;
-                                            if (counter % 1000 == 0)
-                                            {
-                                                worker.ReportProgress(0, string.Format(" - {0} processed", counter));
                                             }
                                         }
                                     }
