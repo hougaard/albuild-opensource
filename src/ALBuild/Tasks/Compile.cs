@@ -23,7 +23,7 @@ namespace ALBuild.Tasks
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = CompilerPath + "\\bin\\alc.exe",
+                    FileName = CompilerPath + "\\bin\\win32\\alc.exe",
                     Arguments = "/project:\"" + Settings["AppPath"].ToString() + 
                                 "\" /packagecachepath:\"" + Settings["AppPath"].ToString() + "\\.alpackages",
                     UseShellExecute = false,
