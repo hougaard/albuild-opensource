@@ -17,8 +17,20 @@ namespace ALBuild.Tasks
         {
             try
             {
-                Console.WriteLine("Copy {0} to {1}", Settings["From"].ToString(), Settings["To"].ToString());
-                File.Copy(Settings["From"].ToString(), Settings["To"].ToString());
+                var path = Settings["From"].ToString();
+
+                // Get files matching the pattern, order by LastWriteTime descending, and select their full paths
+                FileInfo? file = new DirectoryInfo(path)
+                    .GetFiles(@"*.app")                     // apply wildcard
+                    .OrderByDescending(f => f.LastWriteTime)         // oldest first
+                    .FirstOrDefault();
+
+                var fileName = file?.FullName;
+                if (file != null)
+                {
+                    Console.WriteLine("Copy {0} to {1}", Settings["From"].ToString(), fileName);
+                    File.Copy(fileName, Path.Combine(Settings["To"].ToString(), file.Name), true);
+                }
             }
             catch (Exception ex)
             {
