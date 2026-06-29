@@ -115,7 +115,8 @@ namespace ALBuild
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Error: {0}", Res.Message);
                         Console.ForegroundColor = ConsoleColor.White;
-                        return;
+                        throw new Exception("Build failed");
+                        //return;
                     }
                 }
             }
