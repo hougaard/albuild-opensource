@@ -25,7 +25,10 @@ namespace ALBuild.Tasks
                 {
                     FileName = CompilerPath + "\\bin\\win32\\alc.exe",
                     Arguments = "/project:\"" + Settings["AppPath"].ToString() + 
-                                "\" /packagecachepath:\"" + Settings["AppPath"].ToString() + "\\.alpackages",
+                                "\" /packagecachepath:\"" + Settings["AppPath"].ToString() + "\\.alpackages" +
+                                "\" /ruleset:\"" + Settings["AppPath"].ToString() + "\\.vscode\\" + "ruleset.json" +
+                                "\" /assemblyprobingpaths:\"" + "C:\\Windows\\Microsoft.NET\\assembly" +
+                                "\" /features:TranslationFile\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
