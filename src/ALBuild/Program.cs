@@ -71,6 +71,9 @@ namespace ALBuild
                     case "Sign":
                         Res = new Sign().Run((JObject)Task["Settings"], CurrentApp, hostFile);
                         break;
+                    case "Delete":
+                        Res = new Delete().Run((JObject)Task["Settings"]);
+                        break;
                     case "Copy":
                         Res = new Copy().Run((JObject)Task["Settings"]);
                         break;
