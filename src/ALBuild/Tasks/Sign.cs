@@ -26,9 +26,9 @@ namespace ALBuild.Tasks
                 {
                     FileName = SignToolExePath,
                     Arguments = "sign " +
-                                "/f \"" + Settings["KeyFile"] + "\" " +
-                                "/p \"" + Settings["Password"] + "\" " +
-                                "\"" + Settings["AppPath"] + "\\" + AppName + "\"",
+                                //"/f \"" + Settings["KeyFile"] + "\" " +
+                                //"/p \"" + Settings["Password"] + "\" " +
+                                "/sha1 " + Settings["Keyhash"] + " /fd SHA256 \"" + Settings["AppPath"] + "\\" + AppName + "\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
