@@ -71,6 +71,9 @@ namespace ALBuild
                     case "Sign":
                         Res = new Sign().Run((JObject)Task["Settings"], CurrentApp, hostFile);
                         break;
+                    case "Delete":
+                        Res = new Delete().Run((JObject)Task["Settings"]);
+                        break;
                     case "Copy":
                         Res = new Copy().Run((JObject)Task["Settings"]);
                         break;
@@ -112,7 +115,8 @@ namespace ALBuild
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Error: {0}", Res.Message);
                         Console.ForegroundColor = ConsoleColor.White;
-                        return;
+                        throw new Exception("Build failed");
+                        //return;
                     }
                 }
             }
