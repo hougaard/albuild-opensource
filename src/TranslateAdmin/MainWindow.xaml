@@ -13,6 +13,7 @@
             </MenuItem>
             <MenuItem Header="_Tools">
                 <MenuItem Header="_Import XLF" x:Name="ImportXLFMenu" Click="ImportXLFMenu_Click" />
+                <MenuItem Header="Import XLF _Folder" x:Name="ImportXLFFolderMenu" Click="ImportXLFFolderMenu_Click" />
                 <MenuItem Header="_Artifact Ripper" x:Name="RipperMenu" Click="Ripper_Click" />
             </MenuItem>
         </Menu>

@@ -12,8 +12,8 @@ namespace ALBuild
         static async Task Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("ALBuild 22.05.01");
-            Console.WriteLine("(c) 2022 Erik Hougaard - hougaard.com");
+            Console.WriteLine("ALBuild 26.09.11");
+            Console.WriteLine("(c) 2026 Erik Hougaard - hougaard.com");
             if (args.Length == 0)
             {
                 Console.WriteLine("Syntax: ALBuild <buildscript json file> [-offline]");
@@ -67,6 +67,9 @@ namespace ALBuild
                         break;
                     case "Translate":
                         Res = new Translate().Run((JObject)Task["Settings"], hostFile, OffLineMode);
+                        break;
+                    case "TranslateLLM":
+                        Res = new TranslateLlm().Run((JObject)Task["Settings"], hostFile, OffLineMode);
                         break;
                     case "Sign":
                         Res = new Sign().Run((JObject)Task["Settings"], CurrentApp, hostFile);
@@ -140,7 +143,7 @@ namespace ALBuild
                         {
                             Capture cap = m.Captures[0];
                             var SettingsKey = Settings[setting.Key].ToString().Substring(cap.Index, cap.Length);
-                            if (!currentApp.ContainsKey(SettingsKey))
+                            if (!currentApp.ContainsKey(SettingsKey.Trim('%').ToLower()))
                             {
                                 Console.WriteLine("Unknown {0} in {1}", SettingsKey, setting);
                             }

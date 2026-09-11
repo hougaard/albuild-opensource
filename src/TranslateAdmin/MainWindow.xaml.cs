@@ -147,6 +147,48 @@ namespace TranslateAdmin
                 ImportXLF(openFileDialog.FileName);
         }
 
+        private void ImportXLFFolderMenu_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFolderDialog openFolderDialog = new OpenFolderDialog();
+            if (openFolderDialog.ShowDialog() != true)
+                return;
+
+            var files = Directory.GetFiles(openFolderDialog.FolderName, "*.xlf", SearchOption.AllDirectories);
+            if (files.Length == 0)
+            {
+                MessageBox.Show("No .xlf files found in " + openFolderDialog.FolderName);
+                return;
+            }
+
+            int Imported = 0;
+            List<string> Errors = new List<string>();
+            Mouse.OverrideCursor = Cursors.Wait;
+            try
+            {
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        ImportXLF(file, false);
+                        Imported++;
+                    }
+                    catch (Exception ex)
+                    {
+                        Errors.Add(System.IO.Path.GetFileName(file) + ": " + ex.Message);
+                    }
+                }
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
+
+            string Message = string.Format("Imported {0} of {1} file(s).", Imported, files.Length);
+            if (Errors.Count > 0)
+                Message += "\n\nFailed:\n" + string.Join("\n", Errors);
+            MessageBox.Show(Message);
+        }
+
         private void Ripper_Click(object sender, RoutedEventArgs e)
         {
             Ripper ripWindow = new Ripper();
@@ -157,11 +199,11 @@ namespace TranslateAdmin
         {
             this.Close();
         }
-        static void ImportXLF(string FileName)
+        static void ImportXLF(string FileName, bool ShowDone = true)
         {
-            var tableClient = new TableClient(new Uri("https://" + ConfigurationManager.AppSettings["storageaccount"] + ".table.core.windows.net"),
-                                                      "translation",
-                                                      new TableSharedKeyCredential(ConfigurationManager.AppSettings["storageaccount"], ConfigurationManager.AppSettings["storageaccountkey"]));
+            //var tableClient = new TableClient(new Uri("https://" + ConfigurationManager.AppSettings["storageaccount"] + ".table.core.windows.net"),
+            //                                          "translation",
+            //                                          new TableSharedKeyCredential(ConfigurationManager.AppSettings["storageaccount"], ConfigurationManager.AppSettings["storageaccountkey"]));
 
 
             var col = GlobalVars.db.GetCollection<Translation>("translation");
@@ -186,23 +228,24 @@ namespace TranslateAdmin
                     col.EnsureIndex(x => x.Index);
                 }
 
-                var entity = new TableEntity(StoreTranslation.Language, StoreTranslation.Index)
-                                                    {
-                                                        { "Language", StoreTranslation.Language},
-                                                        { "Origin", StoreTranslation.Origin },
-                                                        { "Source", StoreTranslation.source },
-                                                        { "Target", StoreTranslation.target }
-                                                    };
-                try
-                {
-                    tableClient.AddEntity(entity);
-                }
-                catch
-                {
-                    tableClient.UpdateEntity(entity, Azure.ETag.All);
-                }
+                //var entity = new TableEntity(StoreTranslation.Language, StoreTranslation.Index)
+                //                                    {
+                //                                        { "Language", StoreTranslation.Language},
+                //                                        { "Origin", StoreTranslation.Origin },
+                //                                        { "Source", StoreTranslation.source },
+                //                                        { "Target", StoreTranslation.target }
+                //                                    };
+                //try
+                //{
+                //    tableClient.AddEntity(entity);
+                //}
+                //catch
+                //{
+                //    tableClient.UpdateEntity(entity, Azure.ETag.All);
+                //}
             }
-            MessageBox.Show("Done");
+            if (ShowDone)
+                MessageBox.Show("Done");
         }
     }
 }

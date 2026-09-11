@@ -18,15 +18,21 @@ namespace ALBuild.Tasks
         {
             //Console.WriteLine()
             var CompilerPath = LocateCompilerFolder();
+
+            string RuleSet = "";
+            if (Settings.ContainsKey("RuleSet"))
+            {
+                RuleSet = "\" /ruleset:\"" + Settings["AppPath"].ToString() + "\\.vscode\\" + "ruleset.json";
+            }
             
             var proc = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = CompilerPath + "\\bin\\win32\\alc.exe",
+                    FileName = CompilerPath + "\\bin\\alc.exe",
                     Arguments = "/project:\"" + Settings["AppPath"].ToString() + 
                                 "\" /packagecachepath:\"" + Settings["AppPath"].ToString() + "\\.alpackages" +
-                                "\" /ruleset:\"" + Settings["AppPath"].ToString() + "\\.vscode\\" + "ruleset.json" +
+                                RuleSet +
                                 "\" /assemblyprobingpaths:\"" + "C:\\Windows\\Microsoft.NET\\assembly" +
                                 "\" /features:TranslationFile\"",
                     UseShellExecute = false,
