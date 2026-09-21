@@ -108,7 +108,7 @@ namespace TranslationTools
                     TransUnit tu = new TransUnit
                     {
                         Id = Entry.Id,
-                        Note = Entry.Note,
+                        Notes = Entry.Notes,
                         Source = Entry.Source,
                         Target = results[i]
                     };

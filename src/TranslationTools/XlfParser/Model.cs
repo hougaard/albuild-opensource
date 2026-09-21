@@ -98,7 +98,46 @@ namespace XlfParser.Model
         public string Target { get; set; }
 
         [System.Xml.Serialization.XmlElementAttribute(ElementName = "note")]
-        public string Note { get; set; }
+        public List<Note> Notes { get; set; }
+
+        /// <summary>
+        /// The text of the note the developer added in AL (Comment property / //note),
+        /// or null when the trans-unit has no developer note.
+        /// </summary>
+        [System.Xml.Serialization.XmlIgnoreAttribute]
+        public string DeveloperNote
+        {
+            get
+            {
+                if (Notes == null)
+                    return null;
+                foreach (var note in Notes)
+                {
+                    if (note != null &&
+                        string.Equals(note.From, "Developer", StringComparison.OrdinalIgnoreCase) &&
+                        !string.IsNullOrWhiteSpace(note.Value))
+                        return note.Value.Trim();
+                }
+                return null;
+            }
+        }
+    }
+
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Xml.Serialization.XmlRootAttribute(ElementName = "note", IsNullable = false)]
+    public class Note
+    {
+        [System.Xml.Serialization.XmlAttributeAttribute(AttributeName = "from")]
+        public string From { get; set; }
+
+        [System.Xml.Serialization.XmlAttributeAttribute(AttributeName = "annotates")]
+        public string Annotates { get; set; }
+
+        [System.Xml.Serialization.XmlAttributeAttribute(AttributeName = "priority")]
+        public string Priority { get; set; }
+
+        [System.Xml.Serialization.XmlTextAttribute]
+        public string Value { get; set; }
     }
 
     #endregion

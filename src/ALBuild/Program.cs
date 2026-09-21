@@ -101,6 +101,9 @@ namespace ALBuild
                     case "DownloadSymbolsDocker":
                         Res = await new DownloadSymbolsDocker().RunAsync((JObject)Task["Settings"]);
                         break;
+		    case "Upload":
+                        Res = new Upload().Run((JObject)Task["Settings"]);
+                        break;
                     default:
                         Console.WriteLine("Unkown task \"{0}\", aborting", Task["Type"].ToString());
                         return;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Configuration;
@@ -46,9 +46,12 @@ namespace TranslationTools
         {
 
         }
-        public void DoTheWork(string InputFile, string ProductName, string ConfigFile, bool ShowOutput, bool OffLineMode)
+        /// <summary>
+        /// Reads the LLM provider settings from the application configuration.
+        /// Returns false if the configured provider is unknown.
+        /// </summary>
+        public bool Initialize()
         {
-            var config = ConfigurationManager.OpenExeConfiguration(ConfigFile);
             languages = ConfigurationManager.AppSettings["Languages"].Split(',');
 
             provider = ConfigurationManager.AppSettings["LLMProvider"];
@@ -75,8 +78,62 @@ namespace TranslationTools
                     model = "gpt-4o-mini";
             }
             else
+                return false;
+
+            return true;
+        }
+        /// <summary>
+        /// The languages configured in the "Languages" application setting.
+        /// Only available after Initialize() has been called.
+        /// </summary>
+        public string[] Languages
+        {
+            get { return languages; }
+        }
+        /// <summary>
+        /// The active LLM provider name. Only available after Initialize() has been called.
+        /// </summary>
+        public string Provider
+        {
+            get { return provider; }
+        }
+        /// <summary>
+        /// The active LLM model name. Only available after Initialize() has been called.
+        /// </summary>
+        public string Model
+        {
+            get { return model; }
+        }
+        /// <summary>
+        /// True when an API key is configured for the active provider.
+        /// </summary>
+        public bool HasApiKey
+        {
+            get { return !string.IsNullOrEmpty(apiKey); }
+        }
+        /// <summary>
+        /// Translates a single source text into the given locales using the configured LLM.
+        /// Requires Initialize() to have been called first.
+        /// </summary>
+        public Dictionary<string, string> Translate(string Txt, string[] lang)
+        {
+            return CallLlm(Txt, lang, null);
+        }
+        /// <summary>
+        /// Translates a single source text into the given locales using the configured LLM,
+        /// passing the developer note from the xlf along as extra context.
+        /// Requires Initialize() to have been called first.
+        /// </summary>
+        public Dictionary<string, string> Translate(string Txt, string[] lang, string DeveloperNote)
+        {
+            return CallLlm(Txt, lang, DeveloperNote);
+        }
+        public void DoTheWork(string InputFile, string ProductName, string ConfigFile, bool ShowOutput, bool OffLineMode)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigFile);
+            if (!Initialize())
             {
-                Console.WriteLine("Unknown LLMProvider \"{0}\" in .config file, use \"Claude\" or \"ChatGPT\".", provider);
+                Console.WriteLine("Unknown LLMProvider \"{0}\" in .config file, use \"Claude\" or \"ChatGPT\".", ConfigurationManager.AppSettings["LLMProvider"]);
                 return;
             }
 
@@ -113,7 +170,7 @@ namespace TranslationTools
             {
                 string[] results;
 
-                results = TranslateLocal(AppName, Entry.Source, languages, col, OffLineMode);
+                results = TranslateLocal(AppName, Entry.Source, Entry.DeveloperNote, languages, col, OffLineMode);
                 if (ShowOutput)
                     UpdateStatus();
                 for (int i = 0; i < results.Length; i++)
@@ -121,7 +178,7 @@ namespace TranslationTools
                     TransUnit tu = new TransUnit
                     {
                         Id = Entry.Id,
-                        Note = Entry.Note,
+                        Notes = Entry.Notes,
                         Source = Entry.Source,
                         Target = results[i]
                     };
@@ -165,7 +222,7 @@ namespace TranslationTools
                 System.IO.File.WriteAllText(InputFile.Replace(".g.", ".g." + languages[i] + "."), xml2.Replace("utf-16", "utf-8"));
             }
         }
-        string[] TranslateLocal(string AppName, string Txt, string[] outputLanguages, ILiteCollection<Translation> col, bool OffLineMode)
+        string[] TranslateLocal(string AppName, string Txt, string DeveloperNote, string[] outputLanguages, ILiteCollection<Translation> col, bool OffLineMode)
         {
             TranslateCount++;
             string[] result = new string[outputLanguages.Length];
@@ -173,7 +230,8 @@ namespace TranslationTools
             List<string> Missing = new List<string>();
             foreach (var lng in outputLanguages)
             {
-                var res = col.Find(x => x.Index == Translation.Hash(lng, Txt));
+                string index = Translation.Hash(lng, Txt, DeveloperNote);
+                var res = col.Find(x => x.Index == index);
                 if (res.Count() == 0)
                     Missing.Add(lng);
                 else
@@ -184,7 +242,7 @@ namespace TranslationTools
             }
             if (Missing.Count > 0 && !OffLineMode)
             {
-                var llmResult = CallLlm(Txt, Missing.ToArray());
+                var llmResult = CallLlm(Txt, Missing.ToArray(), DeveloperNote);
                 foreach (var lng in Missing)
                 {
                     if (llmResult.ContainsKey(lng))
@@ -193,7 +251,8 @@ namespace TranslationTools
                         translation.source = Txt;
                         translation.target = llmResult[lng];
                         translation.Language = lng;
-                        translation.Index = Translation.Hash(translation.Language, translation.source);
+                        translation.Note = DeveloperNote;
+                        translation.Index = Translation.Hash(translation.Language, translation.source, translation.Note);
                         translation.Origin = AppName;
                         col.Insert(translation);
                         col.EnsureIndex(x => x.Index);
@@ -213,9 +272,9 @@ namespace TranslationTools
                 result[i] = ResultList[outputLanguages[i]];
             return result;
         }
-        Dictionary<string, string> CallLlm(string Txt, string[] lang)
+        Dictionary<string, string> CallLlm(string Txt, string[] lang, string DeveloperNote)
         {
-            string prompt = BuildPrompt(Txt, lang);
+            string prompt = BuildPrompt(Txt, lang, DeveloperNote);
             int Retries = 0;
             do
             {
@@ -227,7 +286,20 @@ namespace TranslationTools
                     else
                         responseText = CallChatGpt(prompt);
 
+                    
                     var parsed = ParseJsonResult(responseText);
+                    Console.WriteLine();
+                    Console.WriteLine("Translation of: \"{0}\"", Txt);
+                    if (!string.IsNullOrWhiteSpace(DeveloperNote))
+                        Console.WriteLine("    (developer note: {0})", DeveloperNote.Trim());
+                    foreach (var lng in lang)
+                    {
+                        string translated;
+                        if (!parsed.TryGetValue(lng, out translated) || string.IsNullOrEmpty(translated))
+                            translated = "(missing)";
+                        Console.WriteLine("    {0,-10} {1}", lng, translated);
+                    }
+
                     Dictionary<string, string> result = new Dictionary<string, string>();
                     foreach (var lng in lang)
                     {
@@ -241,8 +313,9 @@ namespace TranslationTools
                 catch (Exception ex)
                 {
                     // Translation failed
-                    Thread.Sleep(1000);
+                    //Thread.Sleep(1000);
                     Retries++;
+                    Console.Write(".");
                     if (Retries > 5)
                     {
                         Console.WriteLine("\nTranslation failed for {0} with error {1} {2}", Txt, ex.Message, ex.StackTrace);
@@ -270,17 +343,24 @@ namespace TranslationTools
             sb.AppendLine("Translate the English (en-US) user interface text given by the user into each of the target locales listed.");
             sb.AppendLine("Rules:");
             sb.AppendLine("- Use the application context above to pick the terminology and translation that best fits the domain.");
+            sb.AppendLine("- A text may come with a note from the developer. That note is context about how the text is used - follow it, but never translate or include it in the output.");
             sb.AppendLine("- Preserve any placeholders such as %1, %2, {0}, {1} exactly as-is.");
             sb.AppendLine("- Keep the same capitalization style and punctuation as the source where appropriate for the target language.");
             sb.AppendLine("- Treat the locale \"es-ES_tradnl\" as Spanish (Spain, traditional sort).");
             sb.AppendLine("- Respond ONLY with a single JSON object where each key is the exact locale code given and each value is the translated text. No markdown, no explanation.");
             return sb.ToString();
         }
-        string BuildPrompt(string Txt, string[] lang)
+        string BuildPrompt(string Txt, string[] lang, string DeveloperNote)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Target locales: " + string.Join(", ", lang));
             sb.AppendLine();
+            if (!string.IsNullOrWhiteSpace(DeveloperNote))
+            {
+                sb.AppendLine("Note from the developer about this text (context only, do not translate it):");
+                sb.AppendLine(DeveloperNote.Trim());
+                sb.AppendLine();
+            }
             sb.AppendLine("Text to translate:");
             sb.Append(Txt);
             return sb.ToString();
@@ -290,7 +370,7 @@ namespace TranslationTools
             var payload = new JObject
             {
                 ["model"] = model,
-                ["max_tokens"] = 4096,
+                ["max_tokens"] = 40960,
                 ["system"] = BuildSystemPrompt(),
                 ["messages"] = new JArray
                 {
@@ -304,13 +384,17 @@ namespace TranslationTools
             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.anthropic.com/v1/messages");
             request.Headers.Add("x-api-key", apiKey);
             request.Headers.Add("anthropic-version", "2023-06-01");
+            var Start = DateTime.Now;
             request.Content = new StringContent(payload.ToString(Formatting.None), Encoding.UTF8, "application/json");
             var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
             var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            var End = DateTime.Now;
+            if ((End - Start).TotalSeconds > 10)
+                Console.WriteLine($"Claude API call took {(End - Start).TotalSeconds:F2} seconds");
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Claude API error " + (int)response.StatusCode + ": " + body);
             var json = JObject.Parse(body);
-            return (string)json["content"][1]["text"];
+            return (string)json["content"][json["content"].Count() - 1]["text"];
         }
         string CallChatGpt(string prompt)
         {

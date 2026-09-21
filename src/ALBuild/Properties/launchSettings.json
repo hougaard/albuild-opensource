@@ -2,7 +2,7 @@
   "profiles": {
     "ALBuild": {
       "commandName": "Project",
-      "commandLineArgs": "designer.json"
+      "commandLineArgs": "\"c:\\working\\Advanced Financial Reporting\\build\\aas.json\""
     }
   }
 }
