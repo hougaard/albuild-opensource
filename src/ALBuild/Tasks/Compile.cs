@@ -17,7 +17,7 @@ namespace ALBuild.Tasks
         public Result Run(JObject Settings)
         {
             //Console.WriteLine()
-            var CompilerPath = LocateCompilerFolder();
+            var CompilerPath = LocateCompiler();
 
             string RuleSet = "";
             if (Settings.ContainsKey("RuleSet"))
@@ -29,7 +29,7 @@ namespace ALBuild.Tasks
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = CompilerPath + "\\bin\\alc.exe",
+                    FileName = CompilerPath,
                     Arguments = "/project:\"" + Settings["AppPath"].ToString() + 
                                 "\" /packagecachepath:\"" + Settings["AppPath"].ToString() + "\\.alpackages" +
                                 RuleSet +
@@ -48,13 +48,27 @@ namespace ALBuild.Tasks
           
             return new Result(proc.ExitCode == 0);
         }
-        public string LocateCompilerFolder()
+        public string LocateCompiler()
         {
             foreach (var folder in Directory.GetDirectories(Environment.ExpandEnvironmentVariables("%USERPROFILE%\\.vscode\\extensions\\")))
             {
                 if (folder.Contains("ms-dynamics-smb.al"))
                 {
-                    return folder;
+                    // Array of possible alc.exe locations within the extensions folder:
+                    string[] relativePathsToTry = new[]
+                    {
+                        Path.Combine("bin", "win32", "alc.exe"),
+                        Path.Combine("bin", "alc.exe")
+                    };
+
+                    foreach (var relativePath in relativePathsToTry)
+                    {
+                        string compilerFullPath = Path.Combine(folder, relativePath);
+                        if (File.Exists(compilerFullPath))
+                        {
+                            return compilerFullPath;
+                        }
+                    }
                 }
             }
             throw new Exception("Cannot locate Business Central ALC Compiler, cannot continue");
