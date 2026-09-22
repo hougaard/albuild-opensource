@@ -17,7 +17,7 @@ ALBuild supports the following types of operations:
 * Run test codeunits on Docker container with Basic authentication
 * Run test codeunits on Business Central SaaS with OAuth authentication
 * Translate XLF using Azure Cognitive Services
-* Translate XLF using an LLM (Claude or ChatGPT)
+* Translate XLF using an LLM (Claude, ChatGPT, or a local Ollama model)
 * Update version in app.json
 
 The list of operations is defined in a .json file that describes the series of operations.
@@ -85,11 +85,16 @@ Each app has a .config file where you configure:
     <add key="ClaudeModel" value="<Claude model, defaults to claude-sonnet-4-5 when empty>"/>
     <add key="OpenAIKey" value="<OpenAI API key>"/>
     <add key="OpenAIModel" value="<OpenAI model, defaults to gpt-4o-mini when empty>"/>
+    <add key="OllamaEndpoint" value="http://localhost:11434/v1/chat/completions"/>
+    <add key="OllamaModel" value="<Installed Ollama model name>"/>
+    <add key="OllamaApiKey" value="<Optional API key, defaults to ollama when empty>"/>
   </appSettings>
 </configuration>
 ```
 
-`LLMProvider` must be either `Claude` or `ChatGPT` (`OpenAI` is accepted as an alias); if it is empty, `ChatGPT` is used. If no key is configured for the selected provider, the translation runs in offline mode (local database only).
+`LLMProvider` must be `Claude`, `ChatGPT`, or `Ollama` (`OpenAI` is accepted as an alias); if it is empty, `ChatGPT` is used. Claude and ChatGPT run in offline mode when their selected API key is empty.
+
+For a local Ollama server, set `LLMProvider` to `Ollama` and set `OllamaModel` to the name of an installed model. `OllamaEndpoint` is the complete OpenAI-compatible chat-completions URL and defaults to `http://localhost:11434/v1/chat/completions`. An empty `OllamaApiKey` uses `ollama` as a dummy Bearer token, so a standard local Ollama installation does not require credentials; the setting can also hold a real token for an authenticated proxy.
 
 # Variables
 
