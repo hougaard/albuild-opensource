@@ -19,7 +19,9 @@ namespace TranslationTools
         string provider;
         string apiKey;
         string model;
+        string endpoint;
         string appContext;
+        string initializationError;
 
         public string SystemPrompt { get; set; }
         static readonly HttpClient httpClient = new HttpClient() { Timeout = TimeSpan.FromMinutes(5) };
@@ -52,6 +54,7 @@ namespace TranslationTools
         /// </summary>
         public bool Initialize()
         {
+            initializationError = null;
             languages = ConfigurationManager.AppSettings["Languages"].Split(',');
 
             provider = ConfigurationManager.AppSettings["LLMProvider"];
@@ -77,8 +80,27 @@ namespace TranslationTools
                 if (string.IsNullOrEmpty(model))
                     model = "gpt-4o-mini";
             }
+            else if (provider.Equals("Ollama", StringComparison.OrdinalIgnoreCase))
+            {
+                provider = "Ollama";
+                endpoint = ConfigurationManager.AppSettings["OllamaEndpoint"];
+                if (string.IsNullOrEmpty(endpoint))
+                    endpoint = "http://localhost:11434/v1/chat/completions";
+                apiKey = ConfigurationManager.AppSettings["OllamaApiKey"];
+                if (string.IsNullOrEmpty(apiKey))
+                    apiKey = "ollama";
+                model = ConfigurationManager.AppSettings["OllamaModel"];
+                if (string.IsNullOrWhiteSpace(model))
+                {
+                    initializationError = "OllamaModel must be specified in the .config file.";
+                    return false;
+                }
+            }
             else
+            {
+                initializationError = string.Format("Unknown LLMProvider \"{0}\" in .config file, use \"Claude\", \"ChatGPT\", or \"Ollama\".", provider);
                 return false;
+            }
 
             return true;
         }
@@ -133,7 +155,7 @@ namespace TranslationTools
             var config = ConfigurationManager.OpenExeConfiguration(ConfigFile);
             if (!Initialize())
             {
-                Console.WriteLine("Unknown LLMProvider \"{0}\" in .config file, use \"Claude\" or \"ChatGPT\".", ConfigurationManager.AppSettings["LLMProvider"]);
+                Console.WriteLine(initializationError);
                 return;
             }
 
@@ -283,6 +305,8 @@ namespace TranslationTools
                     string responseText;
                     if (provider == "Claude")
                         responseText = CallClaude(prompt);
+                    else if (provider == "Ollama")
+                        responseText = CallOllama(prompt);
                     else
                         responseText = CallChatGpt(prompt);
 
@@ -398,6 +422,14 @@ namespace TranslationTools
         }
         string CallChatGpt(string prompt)
         {
+            return CallOpenAiCompatible(prompt, "https://api.openai.com/v1/chat/completions", "OpenAI");
+        }
+        string CallOllama(string prompt)
+        {
+            return CallOpenAiCompatible(prompt, endpoint, "Ollama");
+        }
+        string CallOpenAiCompatible(string prompt, string requestEndpoint, string serviceName)
+        {
             var payload = new JObject
             {
                 ["model"] = model,
@@ -416,13 +448,13 @@ namespace TranslationTools
                     }
                 }
             };
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
+            var request = new HttpRequestMessage(HttpMethod.Post, requestEndpoint);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             request.Content = new StringContent(payload.ToString(Formatting.None), Encoding.UTF8, "application/json");
             var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
             var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
-                throw new Exception("OpenAI API error " + (int)response.StatusCode + ": " + body);
+                throw new Exception(serviceName + " API error " + (int)response.StatusCode + ": " + body);
             var json = JObject.Parse(body);
             return (string)json["choices"][0]["message"]["content"];
         }
