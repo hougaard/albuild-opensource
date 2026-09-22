@@ -43,32 +43,38 @@ namespace TranslateAdmin
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             var col = GlobalVars.db.GetCollection<Translation>("translation");
-            if (SearchName.Text.StartsWith("*"))
+            IEnumerable<Translation> query = col.FindAll();
+
+            if (LanguageSelect.SelectedIndex != 0)
+                query = query.Where(x => x.Language == (string)LanguageSelect.SelectedItem);
+
+            string searchText = SearchName.Text;
+            if (searchText.Contains("*"))
             {
-                if (LanguageSelect.SelectedIndex == 0)
-                {
-                    var results = col.Query().Where(x => x.source.Contains(SearchName.Text.Substring(1))).Limit(200).ToList();
-                    Result.ItemsSource = results;
-                }
-                else
-                {
-                    var results = col.Query().Where(x => x.source.Contains(SearchName.Text.Substring(1)) && x.Language == (string)LanguageSelect.SelectedItem).Limit(200).ToList();
-                    Result.ItemsSource = results;
-                }
+                var regex = WildcardToRegex(searchText);
+                query = query.Where(x => x.source != null && regex.IsMatch(x.source));
             }
             else
             {
-                if (LanguageSelect.SelectedIndex == 0)
-                {
-                    var results = col.Query().Where(x => x.source.Equals(SearchName.Text)).Limit(200).ToList();
-                    Result.ItemsSource = results;
-                }
-                else
-                {
-                    var results = col.Query().Where(x => x.source.Equals(SearchName.Text) && x.Language == (string)LanguageSelect.SelectedItem).Limit(200).ToList();
-                    Result.ItemsSource = results;
-                }
+                query = query.Where(x => x.source != null && x.source.Equals(searchText));
             }
+
+            Result.ItemsSource = query.Take(200).ToList();
+        }
+
+        /// <summary>
+        /// Builds a case-insensitive regex from a search pattern where '*' means "any characters".
+        /// Multiple wildcards are supported anywhere in the pattern (e.g. "*loading*oints*").
+        /// A leading/trailing '*' leaves that side unanchored; without one, that side must match
+        /// the start/end of the source string exactly.
+        /// </summary>
+        static System.Text.RegularExpressions.Regex WildcardToRegex(string pattern)
+        {
+            bool anchorStart = !pattern.StartsWith("*");
+            bool anchorEnd = !pattern.EndsWith("*");
+            string body = string.Join(".*", pattern.Split('*').Select(System.Text.RegularExpressions.Regex.Escape));
+            string full = (anchorStart ? "^" : "") + body + (anchorEnd ? "$" : "");
+            return new System.Text.RegularExpressions.Regex(full, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -81,25 +87,27 @@ namespace TranslateAdmin
             var col = GlobalVars.db.GetCollection<Translation>("translation");
             col.Update(LoadedTranslation);
 
-            var tableClient = new TableClient(new Uri("https://" + ConfigurationManager.AppSettings["storageaccount"] + ".table.core.windows.net"),
-                                                  "translation",
-                                                  new TableSharedKeyCredential(ConfigurationManager.AppSettings["storageaccount"], ConfigurationManager.AppSettings["storageaccountkey"]));
-
-
-            var entity = new TableEntity(LoadedTranslation.Language, LoadedTranslation.Index)
-                                                    {
-                                                        { "Language", LoadedTranslation.Language},
-                                                        { "Origin", LoadedTranslation.Origin },
-                                                        { "Source", LoadedTranslation.source },
-                                                        { "Target", LoadedTranslation.target }
-                                                    };
-            try
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["storageaccount"]))
             {
-                tableClient.AddEntity(entity);
-            }
-            catch (Exception ex)
-            {
-                tableClient.UpdateEntity(entity, Azure.ETag.All);
+                var tableClient = new TableClient(new Uri("https://" + ConfigurationManager.AppSettings["storageaccount"] + ".table.core.windows.net"),
+                                                      "translation",
+                                                      new TableSharedKeyCredential(ConfigurationManager.AppSettings["storageaccount"], ConfigurationManager.AppSettings["storageaccountkey"]));
+
+                var entity = new TableEntity(LoadedTranslation.Language, LoadedTranslation.Index)
+                                                        {
+                                                            { "Language", LoadedTranslation.Language},
+                                                            { "Origin", LoadedTranslation.Origin },
+                                                            { "Source", LoadedTranslation.source },
+                                                            { "Target", LoadedTranslation.target }
+                                                        };
+                try
+                {
+                    tableClient.AddEntity(entity);
+                }
+                catch (Exception ex)
+                {
+                    tableClient.UpdateEntity(entity, Azure.ETag.All);
+                }
             }
 
             LoadedTranslation = null;
@@ -211,12 +219,16 @@ namespace TranslateAdmin
             var model = XlfParser.Converter.Deserialize(File.ReadAllText(FileName));
             foreach (var Entry in model.File.Body.Group.TransUnit)
             {
+                if (string.IsNullOrWhiteSpace(Entry.Target))
+                    continue;
+
                 Translation StoreTranslation = new Translation();
                 StoreTranslation.source = Entry.Source;
                 StoreTranslation.target = Entry.Target;
                 StoreTranslation.Language = model.File.TargetLanguage;
+                StoreTranslation.Note = Entry.DeveloperNote;
                 StoreTranslation.Origin = System.IO.Path.GetFileName(FileName);
-                StoreTranslation.Index = Translation.Hash(StoreTranslation.Language, StoreTranslation.source);
+                StoreTranslation.Index = Translation.Hash(StoreTranslation.Language, StoreTranslation.source, Entry.DeveloperNote);
                 if (!col.Exists(x => x.Index == StoreTranslation.Index))
                 {
                     col.Insert(StoreTranslation);

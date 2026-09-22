@@ -21,9 +21,16 @@ namespace TranslationTools
         string model;
         string endpoint;
         string appContext;
+        string[] stripPrefixes;
         string initializationError;
 
         public string SystemPrompt { get; set; }
+        /// <summary>
+        /// Comma-separated extension/object name prefixes (e.g. "RMW,CCO") to strip from the
+        /// source text before translation. The prefix is only ever removed from the translated
+        /// target, never from the source, and never reattached.
+        /// </summary>
+        public string StripPrefixes { get; set; }
         static readonly HttpClient httpClient = new HttpClient() { Timeout = TimeSpan.FromMinutes(5) };
 
         int TranslateCount = 0;
@@ -62,6 +69,11 @@ namespace TranslationTools
                 provider = "ChatGPT";
 
             appContext = string.IsNullOrEmpty(SystemPrompt) ? ConfigurationManager.AppSettings["LLMSystemPrompt"] : SystemPrompt;
+
+            string prefixSetting = string.IsNullOrEmpty(StripPrefixes) ? ConfigurationManager.AppSettings["StripPrefixes"] : StripPrefixes;
+            stripPrefixes = string.IsNullOrWhiteSpace(prefixSetting)
+                ? Array.Empty<string>()
+                : prefixSetting.Split(',').Select(p => p.Trim()).Where(p => p.Length > 0).ToArray();
 
             if (provider.Equals("Claude", StringComparison.OrdinalIgnoreCase))
             {
@@ -296,7 +308,16 @@ namespace TranslationTools
         }
         Dictionary<string, string> CallLlm(string Txt, string[] lang, string DeveloperNote)
         {
-            string prompt = BuildPrompt(Txt, lang, DeveloperNote);
+            string textToTranslate = Txt;
+            foreach (var prefix in stripPrefixes)
+            {
+                if (Txt.StartsWith(prefix + " ", StringComparison.Ordinal))
+                {
+                    textToTranslate = Txt.Substring(prefix.Length).TrimStart();
+                    break;
+                }
+            }
+            string prompt = BuildPrompt(textToTranslate, lang, DeveloperNote);
             int Retries = 0;
             do
             {

@@ -19,6 +19,8 @@ namespace ALBuild.Tasks
             var worker = new TranslationTools.TranslateXlfLlm();
             if (Settings["SystemPrompt"] != null)
                 worker.SystemPrompt = Settings["SystemPrompt"].ToString();
+            if (Settings["StripPrefixes"] != null)
+                worker.StripPrefixes = Settings["StripPrefixes"].ToString();
             worker.DoTheWork(Settings["XLFPath"].ToString(), Settings["ProductName"].ToString(), hostFile, true, OffLineMode);
             Console.WriteLine();
             return new Result(true);
