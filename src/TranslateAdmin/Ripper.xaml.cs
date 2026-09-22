@@ -77,9 +77,9 @@ namespace TranslateAdmin
                 //dc.Add(string.Format("Download listings from bcartifacts ({0})", NextMarker));
                 var Master = new XmlDocument();
                 if (NextMarker == "")
-                    Master.LoadXml(await client.GetStringAsync("https://bcartifacts.azureedge.net/sandbox/?comp=list&restype=container&prefix=" + Prefix));
+                    Master.LoadXml(await client.GetStringAsync("https://bcartifacts-exdbf9fwegejdqak.b02.azurefd.net/sandbox/?comp=list&restype=container&prefix=" + Prefix));
                 else
-                    Master.LoadXml(await client.GetStringAsync("https://bcartifacts.azureedge.net/sandbox/?comp=list&restype=container&prefix=" + Prefix + "&marker=" + NextMarker));
+                    Master.LoadXml(await client.GetStringAsync("https://bcartifacts-exdbf9fwegejdqak.b02.azurefd.net/sandbox/?comp=list&restype=container&prefix=" + Prefix + "&marker=" + NextMarker));
                 worker.ReportProgress(0, string.Format("- Download Done"));
                 NextMarker = Master.GetElementsByTagName("NextMarker")[0].InnerText;
                 foreach (XmlNode xn in Master.GetElementsByTagName("Blob"))
@@ -90,7 +90,7 @@ namespace TranslateAdmin
                     if (Filter.Length > 0)
                         if (!Name.Contains(Filter))
                             continue;
-                    var URL = xn.SelectSingleNode("Url").InnerText;
+                    var URL = "https://bcartifacts-exdbf9fwegejdqak.b02.azurefd.net/sandbox/" + Name;
                     worker.ReportProgress(0, string.Format("- Found {0} on {1}", Name, URL));
                     var data = await client.GetByteArrayAsync(URL);
                     MemoryStream ms = new MemoryStream(data.Length);
@@ -105,9 +105,13 @@ namespace TranslateAdmin
                         {
                             var col = GlobalVars.db.GetCollection<Translation>("translation");
 
-                            var tableClient = new TableClient(new Uri("https://" + ConfigurationManager.AppSettings["storageaccount"] + ".table.core.windows.net"),
-                                                "translation",
-                                                new TableSharedKeyCredential(ConfigurationManager.AppSettings["storageaccount"], ConfigurationManager.AppSettings["storageaccountkey"]));
+                            TableClient tableClient = null;
+                            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["storageaccount"]))
+                            {
+                                tableClient = new TableClient(new Uri("https://" + ConfigurationManager.AppSettings["storageaccount"] + ".table.core.windows.net"),
+                                                    "translation",
+                                                    new TableSharedKeyCredential(ConfigurationManager.AppSettings["storageaccount"], ConfigurationManager.AppSettings["storageaccountkey"]));
+                            }
 
                             worker.ReportProgress(0, string.Format("- Extracting {0}", entry.Name));
                             var app = entry.Open();
@@ -163,20 +167,23 @@ namespace TranslateAdmin
                                                     col.Insert(StoreTranslation);
                                                     col.EnsureIndex(x => x.Index);
 
-                                                    var entity = new TableEntity(StoreTranslation.Language, StoreTranslation.Index)
+                                                    if (tableClient != null)
+                                                    {
+                                                        var entity = new TableEntity(StoreTranslation.Language, StoreTranslation.Index)
+                                                            {
+                                                                { "Language", StoreTranslation.Language},
+                                                                { "Origin", StoreTranslation.Origin },
+                                                                { "Source", StoreTranslation.source },
+                                                                { "Target", StoreTranslation.target }
+                                                            };
+                                                        try
                                                         {
-                                                            { "Language", StoreTranslation.Language},
-                                                            { "Origin", StoreTranslation.Origin },
-                                                            { "Source", StoreTranslation.source },
-                                                            { "Target", StoreTranslation.target }
-                                                        };
-                                                    try
-                                                    {
-                                                        tableClient.AddEntity(entity);
-                                                    }
-                                                    catch (Exception ex)
-                                                    {
-                                                        tableClient.UpdateEntity(entity, Azure.ETag.All);
+                                                            tableClient.AddEntity(entity);
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            tableClient.UpdateEntity(entity, Azure.ETag.All);
+                                                        }
                                                     }
                                                 }
                                                 counter++;
